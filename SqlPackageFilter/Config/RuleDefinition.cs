@@ -1,5 +1,4 @@
 ﻿using AgileSqlClub.SqlPackageFilter.Filter;
-using System.Collections.Generic;
 
 namespace AgileSqlClub.SqlPackageFilter.Config
 {
@@ -9,7 +8,6 @@ namespace AgileSqlClub.SqlPackageFilter.Config
         public FilterType FilterType;
         public string Match;
         public MatchType MatchType;
-        public List<string> Options;
     }
 
 
