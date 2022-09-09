@@ -216,5 +216,32 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
                     "SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah' and object_id = object_id('Employees');");
             Assert.AreEqual(1, count, proc.Messages);
         }
+
+        [Test]
+        public void Column_Is_Not_Dropped_When_Keep_all_Is_Used()
+        {
+            _gateway.RunQuery(
+                " exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [ohwahweewah] varchar(max)); ';");
+            var count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah';");
+            Assert.AreEqual(1, count);
+
+
+            var args =
+                $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
+                " /p:DropObjectsNotInSource=False " +
+                "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepTableColumns(all)\" /p:AllowIncompatiblePlatform=true /p:GenerateSmartDefaults=true";
+
+            var proc = new ProcessGateway(Path.Combine(TestContext.CurrentContext.TestDirectory, "SqlPackage.exe\\SqlPackage.exe"), args);
+            proc.Run();
+            proc.WasDeploySuccess();
+
+            count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah';");
+            Assert.AreEqual(1, count, proc.Messages);
+
+            count =
+                _gateway.GetInt(
+                    "SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah' and object_id = object_id('Employees');");
+            Assert.AreEqual(1, count, proc.Messages);
+        }
     }
 }
