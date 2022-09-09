@@ -18,12 +18,12 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests.PathFixer
         public void Fix()
         {
 
-            if(File.Exists(Path.Combine(_source, "SqlPackage.exe", "Extensions", "AgileSqlClub.SqlPackageFilter.dll")))
+            if(File.Exists(Path.Combine(_source, "SqlPackage.exe", "AgileSqlClub.SqlPackageFilter.dll")))
             {
-                File.Delete(Path.Combine(_source, "SqlPackage.exe", "Extensions", "AgileSqlClub.SqlPackageFilter.dll"));
+                File.Delete(Path.Combine(_source, "SqlPackage.exe", "AgileSqlClub.SqlPackageFilter.dll"));
             }
 
-            File.Copy(Path.Combine(_source, "AgileSqlClub.SqlPackageFilter.dll"), Path.Combine(_source, "SqlPackage.exe", "Extensions", "AgileSqlClub.SqlPackageFilter.dll"));
+            File.Copy(Path.Combine(_source, "AgileSqlClub.SqlPackageFilter.dll"), Path.Combine(_source, "SqlPackage.exe", "AgileSqlClub.SqlPackageFilter.dll"));
 
         }
     }

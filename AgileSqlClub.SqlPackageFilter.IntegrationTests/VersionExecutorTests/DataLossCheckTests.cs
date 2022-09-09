@@ -8,7 +8,14 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests.VersionExecutorTests
     [TestFixture]
     public class DataLossCheckTests
     {
-        private readonly SqlGateway _gateway = new SqlGateway(new AppSettingsReader().GetValue("ConnectionString", typeof(string)) as string);
+        private readonly SqlGateway _gateway;
+        private readonly string _connectionString;
+
+        public DataLossCheckTests()
+        {
+            _connectionString = new AppSettingsReader().GetValue("ConnectionString", typeof(string)) as string;
+            _gateway = new SqlGateway(new AppSettingsReader().GetValue("ConnectionString", typeof(string)) as string);
+        }
 
         [Test]
         public void Schema_Is_Not_Dropped_When_Name_Is_Ignored()
@@ -19,7 +26,7 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests.VersionExecutorTests
             _gateway.RunQuery("IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'bloobla') exec sp_executesql N'CREATE table blah.bloobla(id int)';");
 
             var args =
-            $"/Action:Publish /TargetServerName:(localdb)\\Filter /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")}  /TargetDatabaseName:Filters /p:DropObjectsNotInSource=True /p:AllowIncompatiblePlatform=true /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor /p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepSchema(blah)\"";
+            $"/Action:Publish /TargetConnectionString\":{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")}  /p:DropObjectsNotInSource=True /p:AllowIncompatiblePlatform=true /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor /p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepSchema(blah)\"";
 
             var proc = new ProcessGateway( Path.Combine(TestContext.CurrentContext.TestDirectory,   "SqlPackage.exe\\SqlPackage.exe"), args);
             proc.Run();
