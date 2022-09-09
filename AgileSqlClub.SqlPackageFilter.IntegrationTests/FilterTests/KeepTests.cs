@@ -7,7 +7,14 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
     [TestFixture]
     public class KeepTests
     {
-        private readonly SqlGateway _gateway = new SqlGateway(new AppSettingsReader().GetValue("ConnectionString", typeof(string)) as string);
+        private readonly string _connectionString;
+        private readonly SqlGateway _gateway;
+
+        public KeepTests()
+        {
+            _connectionString = new AppSettingsReader().GetValue("ConnectionString", typeof(string)) as string;
+            _gateway = new SqlGateway(_connectionString);
+        }
 
         [Test]
         public void Schema_Is_Not_Dropped_When_Name_Is_To_Keep()
@@ -17,8 +24,8 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
             Assert.AreEqual(1, count);
 
             var args =
-                $"/Action:Publish /TargetServerName:(localdb)\\Filter /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " + 
-                " /TargetDatabaseName:Filters /p:DropObjectsNotInSource=True " +
+                $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " + 
+                " /p:DropObjectsNotInSource=True " +
                 "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepName(ohwahweewah)\" /p:AllowIncompatiblePlatform=true";
 
             var proc = new ProcessGateway( Path.Combine(TestContext.CurrentContext.TestDirectory,   "SqlPackage.exe\\SqlPackage.exe"), args);
@@ -42,8 +49,8 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
             Assert.AreEqual(1, count);
 
             var args =
-                $"/Action:Publish /TargetServerName:(localdb)\\Filter /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
-                " /TargetDatabaseName:Filters /p:DropObjectsNotInSource=True " +
+                $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
+                " /p:DropObjectsNotInSource=True " +
                 "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepSchema(ohwahweewah)\" /p:AllowIncompatiblePlatform=true";
 
             var proc = new ProcessGateway( Path.Combine(TestContext.CurrentContext.TestDirectory,   "SqlPackage.exe\\SqlPackage.exe"), args);
@@ -55,11 +62,7 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
 
             count = _gateway.GetInt("SELECT COUNT(*) FROM sys.tables WHERE name = 'BLAHHHkjkjk';");
             Assert.AreEqual(1, count, proc.Messages);
-
-           
         }
-
-
 
         [Test]
         public void ObjectType_Is_Not_Dropped_When_Filter_Is_To_Keep()
@@ -69,8 +72,8 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
             Assert.AreEqual(1, count);
 
             var args =
-                $"/Action:Publish /TargetServerName:(localdb)\\Filter /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
-                " /TargetDatabaseName:Filters /p:DropObjectsNotInSource=True " +
+                $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
+                " /p:DropObjectsNotInSource=True " +
                 "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepType(ScalarFunction)\" /p:AllowIncompatiblePlatform=true";
 
             var proc = new ProcessGateway( Path.Combine(TestContext.CurrentContext.TestDirectory,   "SqlPackage.exe\\SqlPackage.exe"), args);
@@ -79,8 +82,6 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
             
             count = _gateway.GetInt("SELECT COUNT(*) FROM sys.objects where name = 'funky';");
             Assert.AreEqual(1, count, proc.Messages);
-        
-        
         }
         
     }
