@@ -24,7 +24,7 @@ namespace AgileSqlClub.SqlPackageFilter.Rules
             if (_operation != FilterOperation.Keep)
                 return false;
 
-            if (!Matches(name.Parts.LastOrDefault()))
+            if (!Matches(name.Parts.LastOrDefault()) && MatchType != MatchType.All)
             {
                 return false;
             }

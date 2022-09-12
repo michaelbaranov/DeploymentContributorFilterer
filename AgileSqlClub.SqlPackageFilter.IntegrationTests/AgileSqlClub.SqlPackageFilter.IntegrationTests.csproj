@@ -92,4 +92,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>copy AgileSqlClub.SqlPackageFilter.dll .\SqlPackage.exe\
+copy AgileSqlClub.SqlPackageFilter.pdb .\SqlPackage.exe\</PostBuildEvent>
+  </PropertyGroup>
 </Project>

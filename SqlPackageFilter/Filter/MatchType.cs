@@ -3,6 +3,7 @@
     public enum MatchType
     {
         DoesMatch,
-        DoesNotMatch
+        DoesNotMatch,
+        All
     }
 }

@@ -84,6 +84,16 @@ namespace AgileSqlClub.SqlPackageFilter.UnitTests.Config
             Assert.AreEqual(MatchType.DoesNotMatch ,definition.MatchType);
             Assert.AreEqual("[a-zA-Z]99.*", definition.Match);
         }
-        
+
+        [Test]
+        public void Parses_Keep_all()
+        {
+            var parser = new CommandLineFilterParser(_handler);
+            var definition = parser.GetDefinitions("KeepTableColumns(all)");
+
+            Assert.AreEqual(MatchType.All, definition.MatchType);
+            Assert.AreEqual(string.Empty, definition.Match);
+        }
+
     }
 }

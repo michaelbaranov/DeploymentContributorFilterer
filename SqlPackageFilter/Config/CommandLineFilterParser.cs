@@ -57,7 +57,12 @@ namespace AgileSqlClub.SqlPackageFilter.Config
             value = value.Substring(remove);
 
             var matchType = MatchType.DoesMatch;
-            if (value.FirstOrDefault() == '!')
+            if (value == "(all)")
+            {
+              matchType = MatchType.All;
+              value = string.Empty;
+            }
+            else if (value.FirstOrDefault() == '!')
             {
                 matchType = MatchType.DoesNotMatch;
                 value = value.Substring(1).Trim();
