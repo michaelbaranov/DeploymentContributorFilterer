@@ -29,10 +29,11 @@ Keep are really only ever used in combination with */p:DropObjectsInSource=True*
 
 **Ignore** filters stop any sort of operation, create, alter or drop so there is some flexibility.
 
-Once you know what type of filter you want you need to decide what you will filter on, your choices are: **Name**, **SchemaName** and **object type** (stored procedure, function, table, user, role, rolemembership etc etc).
+Once you know what type of filter you want you need to decide what you will filter on, your choices are: **Name**, **SchemaName**, **TableColumn** and **object type** (stored procedure, function, table, user, role, rolemembership etc etc).
 
 * Name filters work on an objects name, pretty straight forward.
 * Schema filters work on the name of the schema so you can keep or ignore everything in a specific schema
+* TableColumn filters work with specified table columns. Reserved keyword *all* allows ignoring column deletion for all tables
 * Object type filters work on the type of the object as the DacFx api sees it, these types are all documented as properties of the ModelSchema class: [link](http://msdn.microsoft.com/en-us/library/microsoft.sqlserver.dac.model.modelschema.aspx)
 
 The object types are all fields, so the list starts Aggregate, ApplicationRole etc etc. Once you have decided how you will filter you specify the filter itself which is a regex, but don’t be scared it doesn’t have to be complex.
@@ -53,6 +54,11 @@ IgnoreType(Table)
 To keep a table called MyTable or MyExcellentFunnyTable:
 ```
 KeepName(.*yTabl.*)
+```
+
+Following filter can prevent deletion of all columns added to target databse:
+```
+KeepTableColumns(all)
 ```
 
 Behind the scenes, matching relies on regex using the default .Net options for the Match method. 
