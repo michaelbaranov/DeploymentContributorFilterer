@@ -7,7 +7,7 @@ using Microsoft.SqlServer.Dac.Extensibility;
 
 namespace AgileSqlClub.SqlPackageFilter.Filter
 {
-  [ExportDeploymentPlanModifier("AgileSqlClub.DeploymentFilterContributor", "1.4.4.1")]
+  [ExportDeploymentPlanModifier("AgileSqlClub.DeploymentFilterContributor", "1.5.0.0")]
   public class DeploymentFilter : DeploymentPlanModifier, IDisplayMessageHandler
   {
     private DisplayMessageLevel _displayLevel = DisplayMessageLevel.Errors;
