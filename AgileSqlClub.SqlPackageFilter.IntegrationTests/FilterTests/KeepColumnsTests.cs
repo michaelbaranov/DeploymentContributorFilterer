@@ -23,6 +23,25 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         }
 
         [Test]
+        public void Column_Is_Added_When_Column_In_Dacpac_Is_Added()
+        {
+            _gateway.RunQuery(
+                " exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY); ';");
+
+            var args =
+                $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
+                " /p:DropObjectsNotInSource=True " +
+                "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter=KeepTableColumns(Employees)\" /p:AllowIncompatiblePlatform=true /p:GenerateSmartDefaults=true";
+
+            var proc = new ProcessGateway(Path.Combine(TestContext.CurrentContext.TestDirectory, "SqlPackage.exe\\SqlPackage.exe"), args);
+            proc.Run();
+            proc.WasDeploySuccess();
+
+            var count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'Name' and object_id = object_id('Employees');");
+            Assert.AreEqual(1, count, proc.Messages);
+        }
+
+        [Test]
         public void Column_Is_Not_Dropped_When_Column_In_Dacpac_Is_Added()
         {
             _gateway.RunQuery(
@@ -40,11 +59,6 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
             proc.WasDeploySuccess();
 
             count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah';");
-            Assert.AreEqual(1, count, proc.Messages);
-
-            count =
-                _gateway.GetInt(
-                    "SELECT COUNT(*) FROM sys.columns where name = 'Name' and object_id = object_id('Employees');");
             Assert.AreEqual(1, count, proc.Messages);
         }
 
@@ -166,7 +180,9 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         [Test]
         public void Column_Is_Not_Dropped_When_Name_Is_To_Keep_And_Constraint_Is_Dropped()
         {
-            //exec sp_executesql N'alter table Employees add constraint [cs_abcd] check (Name like ''%%''); '
+            _gateway.RunQuery(
+                "exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [Name] VARCHAR(25) NOT NULL);';");
+
             _gateway.RunQuery(
                 "IF NOT EXISTS (select * from sys.objects where name = 'cs_abcd') exec sp_executesql N'alter table Employees add constraint [cs_abcd] check (Name like ''%%'');';");
             var count = _gateway.GetInt("select COUNT(*) from sys.objects where name = 'cs_abcd';");

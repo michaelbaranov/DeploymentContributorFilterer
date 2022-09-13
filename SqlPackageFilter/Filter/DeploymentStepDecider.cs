@@ -15,7 +15,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
     {
       var dlcStep = new DataLossCheckStep(step);
       return !dlcStep.IsDataLossCheck ? null : new DeploymentStepDecision() {
-        Remove = decider.ShouldRemoveFromPlan(dlcStep.ObjectName, ModelSchema.Table, StepType.Drop),
+        Remove = decider.ShouldRemoveFromPlan(dlcStep.ObjectName, ModelSchema.Table, StepType.Drop, step),
         StepType = StepType.DataLossCheck,
         ObjectName = dlcStep.ObjectName.ToString()
       };
@@ -27,7 +27,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
 
       return alterStep == null ? null : new DeploymentStepDecision()
       {
-        Remove = decider.ShouldRemoveFromPlan(alterStep.TargetElement?.Name ?? new ObjectIdentifier(), alterStep.TargetElement?.ObjectType, StepType.Alter, alterStep),
+        Remove = decider.ShouldRemoveFromPlan(alterStep.TargetElement?.Name ?? new ObjectIdentifier(), alterStep.TargetElement?.ObjectType, StepType.Alter, step),
         StepType = StepType.Alter,
         ObjectName = alterStep.TargetElement?.Name?.ToString() ?? ""
       };
@@ -39,7 +39,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
 
       return dropStep == null ? null : new DeploymentStepDecision()
       {
-        Remove = decider.ShouldRemoveFromPlan(dropStep.TargetElement?.Name ?? new ObjectIdentifier(), dropStep.TargetElement?.ObjectType, StepType.Drop),
+        Remove = decider.ShouldRemoveFromPlan(dropStep.TargetElement?.Name ?? new ObjectIdentifier(), dropStep.TargetElement?.ObjectType, StepType.Drop, step),
         StepType = StepType.Drop,
         ObjectName = dropStep.TargetElement?.Name?.ToString() ?? ""
       };
@@ -51,7 +51,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
 
       return createStep == null ? null : new DeploymentStepDecision()
       {
-        Remove = decider.ShouldRemoveFromPlan(createStep.SourceElement?.Name ?? new ObjectIdentifier(), createStep.SourceElement?.ObjectType, StepType.Create),
+        Remove = decider.ShouldRemoveFromPlan(createStep.SourceElement?.Name ?? new ObjectIdentifier(), createStep.SourceElement?.ObjectType, StepType.Create, step),
         StepType = StepType.Create,
         ObjectName = createStep.SourceElement?.Name?.ToString() ?? ""
       };
