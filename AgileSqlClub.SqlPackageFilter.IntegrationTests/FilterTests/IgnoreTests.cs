@@ -147,6 +147,26 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
 
         }
 
+        [Test]
+        public void Triggers_Are_Ignored_With_IgnoreNameParameter()
+        {
+            _gateway.RunQuery(
+                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE name = 'Employees_dss_insert_trigger') EXEC sp_executesql N'CREATE TRIGGER [dbo].[Employees_dss_insert_trigger] ON [dbo].[Employees] AFTER INSERT AS RETURN ';");
+            _gateway.RunQuery(
+                "IF NOT EXISTS(SELECT * FROM SYS.TABLES WHERE NAME = 'Employees') EXEC sp_executesql N'create table Employees(name varchar(max), [EmployeeId] INT NOT NULL PRIMARY KEY';");
+
+            var args =
+                $"/Action:Publish /TargetConnectionString\":{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
+                " /p:DropObjectsNotInSource=False " +
+                "/p:AdditionalDeploymentContributorArguments=\"SqlPackageFilter1=IgnoreName(.*_dss_.*);\"";
+
+            var proc = new ProcessGateway(Path.Combine(TestContext.CurrentContext.TestDirectory, "SqlPackage.exe\\SqlPackage.exe"), args);
+            proc.Run();
+            proc.WasDeploySuccess();
+
+            var count = _gateway.GetInt("SELECT count(*) FROM sys.objects WHERE name = 'Employees_dss_insert_trigger'");
+            Assert.AreEqual(1, count);
+        }
 
     }
 }
