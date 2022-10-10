@@ -151,9 +151,10 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         public void Triggers_Are_Ignored_With_IgnoreNameParameter()
         {
             _gateway.RunQuery(
-                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE name = 'Employees_dss_insert_trigger') EXEC sp_executesql N'CREATE TRIGGER [dbo].[Employees_dss_insert_trigger] ON [dbo].[Employees] AFTER INSERT AS RETURN ';");
-            _gateway.RunQuery(
                 "IF NOT EXISTS(SELECT * FROM SYS.TABLES WHERE NAME = 'Employees') EXEC sp_executesql N'create table Employees(name varchar(max), [EmployeeId] INT NOT NULL PRIMARY KEY';");
+            _gateway.RunQuery(
+                "IF NOT EXISTS (SELECT * FROM sys.objects WHERE name = 'Employees_dss_insert_trigger') EXEC sp_executesql N'CREATE TRIGGER [dbo].[Employees_dss_insert_trigger] ON [dbo].[Employees] AFTER INSERT AS RETURN ';");
+
 
             var args =
                 $"/Action:Publish /TargetConnectionString\":{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
