@@ -159,9 +159,11 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         public void Column_Is_Not_Dropped_When_Name_Is_To_Keep()
         {
             _gateway.RunQuery(
-                "IF NOT EXISTS (SELECT * FROM sys.columns WHERE name = 'ohwahweewah') exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [Name] VARCHAR(25) NOT NULL, [ohwahweewah] varchar(max)); ';");
+                "exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [Name] VARCHAR(25) NOT NULL, [ohwahweewah] varchar(max)); ';");
             var count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah';");
-            Assert.AreEqual(1, count);
+          _gateway.RunQuery(
+                    "insert into Employees([EmployeeId],[Name]) values (1,'user');");
+      Assert.AreEqual(1, count);
 
 
             var args =
@@ -238,6 +240,8 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         {
             _gateway.RunQuery(
                 " exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [ohwahweewah] varchar(max)); ';");
+            _gateway.RunQuery(
+                "insert into Employees([EmployeeId],[ohwahweewah]) values (1,'ohwahweewah');");
             var count = _gateway.GetInt("SELECT COUNT(*) FROM sys.columns where name = 'ohwahweewah';");
             Assert.AreEqual(1, count);
 
@@ -264,8 +268,9 @@ namespace AgileSqlClub.SqlPackageFilter.IntegrationTests
         public void Column_Is_Added_When_Keep_all_Is_Used()
         {
             _gateway.RunQuery(
-                " exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY); ';");
-
+                "exec sp_executesql N'drop table employees; create table Employees([EmployeeId] INT NOT NULL PRIMARY KEY, [email] varchar (50))';");
+            _gateway.RunQuery(
+                "insert into Employees([EmployeeId],[email]) values (1,'user@email.com');");
             var args =
                 $"/Action:Publish /TargetConnectionString:\"{_connectionString}\" /SourceFile:{Path.Combine(TestContext.CurrentContext.TestDirectory, "Dacpac.Dacpac")} /p:AdditionalDeploymentContributors=AgileSqlClub.DeploymentFilterContributor " +
                 " /p:DropObjectsNotInSource=False " +

@@ -29,6 +29,11 @@ namespace AgileSqlClub.SqlPackageFilter.Rules
                 return false;
             }
                 
+            if (step is DeploymentScriptStep) // This is check data loss script
+            {
+              return true;
+            }
+
             if (step is SqlTableMigrationStep)
             {
                 return true;   //we can't allow a table migration on this table as it would drop our extra columns....

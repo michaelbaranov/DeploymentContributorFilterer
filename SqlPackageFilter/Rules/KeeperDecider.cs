@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using AgileSqlClub.SqlPackageFilter.Filter;
 using Microsoft.SqlServer.Dac.Deployment;
 using Microsoft.SqlServer.Dac.Model;
@@ -45,12 +46,7 @@ namespace AgileSqlClub.SqlPackageFilter.Rules
                     return true;
                 }
 
-                if (operation == FilterOperation.Keep && stepType == StepType.Drop && rule.Matches(name, objectType, step))
-                {
-                    return true;
-                }
-
-                if (operation == FilterOperation.Keep && stepType == StepType.Alter  && rule.Matches(name, objectType, step))  
+                if (operation == FilterOperation.Keep && (stepType == StepType.Drop || stepType == StepType.Alter || stepType == StepType.DataLossCheck) && rule.Matches(name, objectType, step))
                 {
                     return true;
                 }

@@ -15,7 +15,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
     {
       var dlcStep = new DataLossCheckStep(step);
       return !dlcStep.IsDataLossCheck ? null : new DeploymentStepDecision() {
-        Remove = decider.ShouldRemoveFromPlan(dlcStep.ObjectName, ModelSchema.Table, StepType.Drop, step),
+        Remove = decider.ShouldRemoveFromPlan(dlcStep.ObjectName, ModelSchema.Table, StepType.DataLossCheck, step),
         StepType = StepType.DataLossCheck,
         ObjectName = dlcStep.ObjectName.ToString()
       };

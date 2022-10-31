@@ -7,9 +7,10 @@ namespace AgileSqlClub.SqlPackageFilter.Rules
 {
   public class FilterRule
   {
-    protected readonly string Match;
-    protected readonly MatchType MatchType;
-    protected readonly Regex Regex;
+    public readonly string Match;
+    public readonly MatchType MatchType;
+    public readonly Regex Regex;
+    public readonly FilterOperation RuleFilterOperation;
 
     public FilterRule()
     {
@@ -41,8 +42,6 @@ namespace AgileSqlClub.SqlPackageFilter.Rules
 
       return !matches && MatchType == MatchType.DoesNotMatch;
     }
-
-    protected FilterOperation RuleFilterOperation;
 
     public virtual FilterOperation Operation() { return RuleFilterOperation; }
   }

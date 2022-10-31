@@ -32,7 +32,7 @@ namespace AgileSqlClub.SqlPackageFilter.Filter
     {            
       try
       {
-
+                //Debugger.Launch();
         PublishMessage(new ExtensibilityError("Starting AgileSqlClub.DeploymentFilterContributor", Severity.Message));
 
         var rules = new RuleDefinitionFactory(this).BuildRules(context.Arguments, this);
